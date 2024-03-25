@@ -1,4 +1,4 @@
-# UNet
+# PointNet
 
 ## What this is about
 Just a simple implementation based on the PointNet which was in 2017 a revolutionary way of handling point cloud data, which was to... directly look at PointClouds 
