@@ -161,6 +161,10 @@ class PointNet(nn.Module):
         out = self.relu(self.batch_norm_2_3(self.mlp_2_3(out)))
         out = nn.MaxPool1d(num_points)(out)
         if self.network_type == "Segmentation":
+            # All points have the same "global" features hence need to do some broadcasting to cat it to each point
+            # hence our "local" features is BxNx64, but our global features is Bx1X1024
+            # we first do a torch repeat on the global features: Bx1x1024 --> BxNx1024
+            # now ~kiss~ cat
             point_feature_2 = out.transpose(2,1)
             point_feature_2 = point_feature_2.repeat(1,num_points,1)
             segmentation_input = torch.cat((point_feature_1, point_feature_2), dim = 2)

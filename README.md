@@ -1,7 +1,7 @@
 # PointNet
 
 ## What this is about
-Just a simple implementation based on the PointNet which was in 2017 a revolutionary way of handling point cloud data, which was to... directly look at PointClouds 
+Just a simple implementation based on the PointNet which was in 2017 a revolutionary way of handling point cloud data, which was to... directly look at PointClouds. This is just to get a better understanding of the PointNet and I won't be doing training here. Will be handled when I reach its final(as at 2024 don't flame me) form as in ResPointNet
 
 ## What has been done 
 
