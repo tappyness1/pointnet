@@ -92,7 +92,7 @@ class SegmentationNetwork(nn.Module):
         return out
     
 class ClassificationNetWork(nn.Module):
-    def __init__(self, num_classes = 10):
+    def __init__(self, num_classes = 10, input=1024):
         super(ClassificationNetWork, self).__init__()
         self.shared_mlp_1_1 = nn.Conv1d(input, 512, 1)
         self.shared_mlp_1_2 = nn.Conv1d(512, 256, 1)
@@ -171,6 +171,7 @@ class PointNet(nn.Module):
             segmentation_input = torch.cat((point_feature_1, point_feature_2), dim = 2)
             out = self.segmentation_network(segmentation_input)
         else:
+            out = out.transpose(2,1)
             out = self.classification_network(out)
 
         return out
@@ -188,7 +189,8 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     X = torch.tensor(X).to(device)
 
-    model = PointNet(network_type = "Segmentation", num_classes=10)
+    # model = PointNet(network_type = "Segmentation", num_classes=10)
+    model = PointNet(network_type = "Classification", num_classes=10)
     model = model.to(device)
     
     summary(model, (1000,3))
