@@ -54,7 +54,7 @@ class TransformationNetwork(nn.Module):
 
 
 class SegmentationNetwork(nn.Module):
-    def __init__(self, num_classes=10, input=1088):
+    def __init__(self, num_classes=40, input=1088):
         super(SegmentationNetwork, self).__init__()      
         self.shared_mlp_1_1 = nn.Conv1d(input, 512, 1)
         self.shared_mlp_1_2 = nn.Conv1d(512, 256, 1)
@@ -92,7 +92,7 @@ class SegmentationNetwork(nn.Module):
         return out
     
 class ClassificationNetWork(nn.Module):
-    def __init__(self, num_classes = 10, input=1024):
+    def __init__(self, num_classes = 40, input=1024):
         super(ClassificationNetWork, self).__init__()
         self.shared_mlp_1_1 = nn.Conv1d(input, 512, 1)
         self.shared_mlp_1_2 = nn.Conv1d(512, 256, 1)
@@ -171,6 +171,7 @@ class PointNet(nn.Module):
             segmentation_input = torch.cat((point_feature_1, point_feature_2), dim = 2)
             out = self.segmentation_network(segmentation_input)
         else:
+            # need to transpose the out before running it through the classification head.
             out = out.transpose(2,1)
             out = self.classification_network(out)
 

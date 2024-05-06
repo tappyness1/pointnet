@@ -5,7 +5,8 @@ from tqdm import tqdm
 import numpy as np
 from src.model import PointNet
 from src.data_processing.dataset import Model40NetDataset
-# from src.validation import validation
+from src.metrics import process_confusion_matrix
+from src.validation import validation
 
 import torch.nn as nn
 import torch.optim as optim
@@ -43,8 +44,7 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
         with tqdm(train_dataloader) as tepoch:
             for imgs, labels in tepoch:
                 # print (imgs.shape)
-
-                # really only applicable for VOC segmentation data as the segmentations are class/255 for some unknown reason.
+                print (labels)
 
                 optimizer.zero_grad() 
                 out = network(imgs.to(device))
@@ -53,8 +53,8 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
                 optimizer.step()
                 tepoch.set_postfix(loss=loss.item())
         
-        # _, loss = validation(network, val_set, cfg)
-        # scheduler.step(loss)
+        _, loss = validation(network, val_set, cfg)
+        scheduler.step(loss)
         network.train()
         
     print("training done")
@@ -75,8 +75,7 @@ if __name__ == "__main__":
            'show_model_summary': True, 
            'train': {"epochs": 10, 'lr': 1e-3, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
-                     'loss_function': 'energy_loss', 
                      'subset': False, # set False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
-                     'num_classes': 40} # if using VOC Segmentation, set to 21. If Carvana, use 1
+                     'num_classes': 40} # ModelNet40 so 40 classes
             }
     train_classifier(train_set = train_set, val_set = val_set,  cfg = cfg, num_classes = cfg['train']['num_classes'])
