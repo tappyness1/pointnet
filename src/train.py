@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     cfg = {"save_model_path": "model_weights/model_weights.pt",
            'show_model_summary': True, 
-           'train': {"epochs": 3, 'lr': 1e-4, 
+           'train': {"epochs": 10, 'lr': 1e-4, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
                      'subset': False, # set False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
                      'num_classes': 10} # ModelNet40 so 40 classes, whereas ModelNet10 so 10 classes
