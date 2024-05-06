@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 import numpy as np
 from src.model import PointNet
-from src.data_processing.dataset import Model40NetDataset
+from src.data_processing.dataset import ModelNetDataset
 from src.metrics import process_confusion_matrix
 from src.validation import validation
 
@@ -69,16 +69,16 @@ if __name__ == "__main__":
 
     torch.manual_seed(42)
 
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": True}
-    train_set = Model40NetDataset(cfg)
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False}
-    val_set = Model40NetDataset(cfg)
+    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": True, "modelnet_type": "modelnet10",}
+    train_set = ModelNetDataset(cfg)
+    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10",}
+    val_set = ModelNetDataset(cfg)
 
     cfg = {"save_model_path": "model_weights/model_weights.pt",
            'show_model_summary': True, 
            'train': {"epochs": 3, 'lr': 1e-4, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
                      'subset': False, # set False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
-                     'num_classes': 40} # ModelNet40 so 40 classes
+                     'num_classes': 10} # ModelNet40 so 40 classes, whereas ModelNet10 so 10 classes
             }
     train_classifier(train_set = train_set, val_set = val_set,  cfg = cfg, num_classes = cfg['train']['num_classes'])

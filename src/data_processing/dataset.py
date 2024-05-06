@@ -8,17 +8,17 @@ import pandas as pd
 from src.data_processing.dataset_utils import farthest_point_sample, pc_normalize
 
 
-class Model40NetDataset(Dataset):
+class ModelNetDataset(Dataset):
     def __init__(self, cfg):
         self.data_path = cfg['data_path']
         if cfg['train']:
-            self.dataset_path = self.data_path + '/modelnet40_train.txt'
+            self.dataset_path = self.data_path + f"/{cfg['modelnet_type']}_train.txt"
         else:
-            self.dataset_path = self.data_path + '/modelnet40_test.txt'
+            self.dataset_path = self.data_path + f"/{cfg['modelnet_type']}_test.txt"
         
         self.dataset = [line.rstrip() for line in open(self.dataset_path)]
 
-        shape_names = [line.rstrip() for line in open(self.data_path + '/modelnet40_shape_names.txt')]
+        shape_names = [line.rstrip() for line in open(self.data_path + f"/{cfg['modelnet_type']}_shape_names.txt")]
         self.classes = dict(zip(shape_names, range(len(shape_names))))
         # self.classes = {shape: i for i, shape in enumerate(shape_names)}
         
@@ -38,8 +38,8 @@ class Model40NetDataset(Dataset):
         return point_clouds[:, :3], class_id
 
 if __name__ == "__main__":
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False}
-    model40net_dataset = Model40NetDataset(cfg)
+    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10"}
+    model40net_dataset = ModelNetDataset(cfg)
     dataloader = torch.utils.data.DataLoader(model40net_dataset, batch_size=4, shuffle=True)
     for i, (point_clouds, class_id) in enumerate(dataloader):
         print (point_clouds.shape, class_id.shape)
