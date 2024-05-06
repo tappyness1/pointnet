@@ -3,7 +3,9 @@ import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Subset
 from src.metrics import process_confusion_matrix
+from sklearn.metrics import f1_score, classification_report
 import pandas as pd
+import numpy as np
 
 def get_accuracy(preds, ground_truth):
     ground_truth = ground_truth.squeeze(dim=1)
@@ -44,13 +46,21 @@ def validation(model, val_set, cfg, get_metrics = False):
             loss = loss_function(out, labels.unsqueeze(1).to(device)) 
             tepoch.set_postfix(loss=loss.item())  
             losses.append(loss.item())
-            preds.append(torch.argmax(out, dim = 1).flatten())
-            gt.append(labels)
+            if get_metrics:
+                preds.append(torch.argmax(out, dim = 1).flatten())
+                gt.append(labels)
 
     if get_metrics:
-        preds = torch.Tensor(preds)
-        gt = torch.Tensor(gt)
-        print (f"Confusion Matrix: {process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])}")
+        # print (torch.cat(preds))
+        preds = torch.cat(preds).cpu()
+        gt = torch.cat(gt).cpu()
+        cm = process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])
+        cm = pd.DataFrame(cm)
+        print (f"Confusion Matrix: \n{cm}")
+        cm.to_csv("val_results/confusion_matrix.csv", header=False, index=False)
+
+        cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1))
+        print (f"Classification Report: \n{cr}")
 
     print (f"Validation Loss: {sum(losses)/len(losses)}")
 

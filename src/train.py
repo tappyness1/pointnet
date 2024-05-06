@@ -53,12 +53,15 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
                 optimizer.step()
                 tepoch.set_postfix(loss=loss.item())
         
-        _, loss = validation(network, val_set, cfg)
+        loss = validation(network, val_set, cfg, get_metrics = False)
         scheduler.step(loss)
         network.train()
         
     print("training done")
     torch.save(network, cfg['save_model_path'])
+
+    print("Validating dataset")
+    validation(network, val_set, cfg, get_metrics = True)
 
     return network
 
@@ -73,7 +76,7 @@ if __name__ == "__main__":
 
     cfg = {"save_model_path": "model_weights/model_weights.pt",
            'show_model_summary': True, 
-           'train': {"epochs": 10, 'lr': 1e-3, 
+           'train': {"epochs": 3, 'lr': 1e-4, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
                      'subset': False, # set False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
                      'num_classes': 40} # ModelNet40 so 40 classes
