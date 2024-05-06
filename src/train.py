@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader, Subset
-from torchsummary import summary
+# from torchsummary import summary
 from tqdm import tqdm
 import numpy as np
 from src.model import PointNet
@@ -29,8 +29,8 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
 
     network = network.to(device)
 
-    if cfg['show_model_summary']:
-        summary(network, (1024, 3))
+    # if cfg['show_model_summary']:
+    #     summary(network, (1024, 3))
 
     if cfg['train']['subset']:
         subset_indices = torch.randperm(len(train_set))[:cfg['train']['subset']]
@@ -44,7 +44,7 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
         with tqdm(train_dataloader) as tepoch:
             for imgs, labels in tepoch:
                 # print (imgs.shape)
-                print (labels)
+                # print (labels)
 
                 optimizer.zero_grad() 
                 out = network(imgs.to(device))

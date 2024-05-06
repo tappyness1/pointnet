@@ -26,7 +26,7 @@ class TransformationNetwork(nn.Module):
         self.fc_3 = nn.Linear(256, self.output_dim*self.output_dim)
 
         self.relu = ReLU()
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
     def forward(self, input)-> torch.Tensor:
         num_points = input.shape[1]
@@ -44,14 +44,12 @@ class TransformationNetwork(nn.Module):
         out = self.fc_3(out)
 
         identity_matrix = torch.eye(self.output_dim) # the identity matrix... the OG residual block! 
-        
         if torch.cuda.is_available():
-            identity_matrix.to(self.device)
+            identity_matrix = identity_matrix.to(self.device)
 
         out = out.reshape(-1, self.output_dim, self.output_dim) + identity_matrix
         
         return out
-
 
 class SegmentationNetwork(nn.Module):
     def __init__(self, num_classes=40, input=1088):
