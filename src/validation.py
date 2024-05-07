@@ -25,8 +25,8 @@ def validation(model, val_set, cfg, get_metrics = False):
     """
     model.eval()
 
-    if cfg['train']['subset']:
-        subset_indices = torch.randperm(len(val_set))[:cfg['train']['subset']]
+    if cfg['train']['val_subset']:
+        subset_indices = torch.randperm(len(val_set))[:cfg['train']['val_subset']]
         val_set = Subset(val_set, subset_indices)
 
     val_dataloader = DataLoader(val_set, batch_size=5, shuffle = True)
