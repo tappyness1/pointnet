@@ -32,8 +32,8 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
     # if cfg['show_model_summary']:
     #     summary(network, (1024, 3))
 
-    if cfg['train']['subset']:
-        subset_indices = torch.randperm(len(train_set))[:cfg['train']['subset']]
+    if cfg['train']['train_subset']:
+        subset_indices = torch.randperm(len(train_set))[:cfg['train']['train_subset']]
         train_set = Subset(train_set, subset_indices)
     
     train_dataloader = DataLoader(train_set, batch_size=6, shuffle = True)
@@ -76,9 +76,10 @@ if __name__ == "__main__":
 
     cfg = {"save_model_path": "model_weights/model_weights.pt",
            'show_model_summary': True, 
-           'train': {"epochs": 10, 'lr': 1e-4, 
+           'train': {"epochs": 2, 'lr': 1e-4, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
-                     'subset': False, # set False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
+                     'train_subset': 3990, # set 3990 for ModelNet10 else False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
+                     'val_subset': 906, # set 906 for ModelNet10, False otherwise
                      'num_classes': 10} # ModelNet40 so 40 classes, whereas ModelNet10 so 10 classes
             }
     train_classifier(train_set = train_set, val_set = val_set,  cfg = cfg, num_classes = cfg['train']['num_classes'])
