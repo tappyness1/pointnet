@@ -36,7 +36,7 @@ def train_classifier(train_set, val_set, cfg, num_classes = 40):
         subset_indices = torch.randperm(len(train_set))[:cfg['train']['train_subset']]
         train_set = Subset(train_set, subset_indices)
     
-    train_dataloader = DataLoader(train_set, batch_size=6, shuffle = True)
+    train_dataloader = DataLoader(train_set, batch_size=8, shuffle = True)
 
     for epoch in range(cfg['train']['epochs']):
         print (f"Epoch {epoch + 1}:")
@@ -69,14 +69,21 @@ if __name__ == "__main__":
 
     torch.manual_seed(42)
 
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": True, "modelnet_type": "modelnet10",}
+    # # for local/VM runs
+    # cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": True, "modelnet_type": "modelnet10",}
+    # train_set = ModelNetDataset(cfg)
+    # cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10",}
+    # val_set = ModelNetDataset(cfg)
+
+    # for Colab runs
+    cfg = {"data_path": "/content/modelnet40_normal_resampled", "train": True, "modelnet_type": "modelnet10",}
     train_set = ModelNetDataset(cfg)
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10",}
+    cfg = {"data_path": "/content/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10",}
     val_set = ModelNetDataset(cfg)
 
     cfg = {"save_model_path": "model_weights/model_weights.pt",
            'show_model_summary': True, 
-           'train': {"epochs": 2, 'lr': 1e-4, 
+           'train': {"epochs": 10, 'lr': 1e-4, 
                      'weight_decay': 1e-8, 'momentum':0.999, 
                      'train_subset': 3990, # set 3990 for ModelNet10 else False if not intending to use subset. Set to 20 or something for small dataset experimentation/debugging
                      'val_subset': 906, # set 906 for ModelNet10, False otherwise

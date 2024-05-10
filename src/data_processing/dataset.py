@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 from src.data_processing.dataset_utils import farthest_point_sample, pc_normalize
+import json
+import numpy as np
 
 
 class ModelNetDataset(Dataset):
@@ -36,11 +38,58 @@ class ModelNetDataset(Dataset):
         class_id = self.classes[class_name]
 
         return point_clouds[:, :3], class_id
+    
+class ShapeNetDataset(Dataset):
+
+    def __init__(self, cfg):
+        self.data_path = cfg['data_path']
+        if cfg['train']:
+            self.dataset_path = os.path.join(self.data_path, "train_test_split", "shuffled_train_file_list.json")
+        else:
+            self.dataset_path = os.path.join(self.data_path, "train_test_split", "shuffled_val_file_list.json")
+
+        f = open(self.dataset_path)
+        data = json.load(f)
+        data_split = [instance.split("/") for instance in data]
+
+        # only get the instances of the class. eg airplane only instances
+        self.dataset = ["/".join(instance[1:]) for instance in data_split if instance[1] == cfg['instance']]
+
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+
+        point_cloud_path = os.path.join(self.data_path, f"{self.dataset[idx]}.txt")
+
+        point_clouds = pd.read_csv(point_cloud_path, 
+                                   delimiter=" ", 
+                                   names = ["x", "y", "z", "r", "g", "b", "label"], 
+                                   header=None).to_numpy().astype('float32')
+        if point_clouds.shape[0] < cfg['shape_cut_off']:
+            point_clouds = np.concatenate([point_clouds, np.zeros((cfg['shape_cut_off'] - point_clouds.shape[0], 7))])
+        point_clouds = point_clouds[:cfg['shape_cut_off']]
+
+        # TODO: control the dummy points by introducing mask
+
+        return point_clouds[:, :3], point_clouds[:, -1]
+    
+        
 
 if __name__ == "__main__":
-    cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10"}
-    model40net_dataset = ModelNetDataset(cfg)
-    dataloader = torch.utils.data.DataLoader(model40net_dataset, batch_size=4, shuffle=True)
+    # cfg = {"data_path": "../data/modelnet40_normal_resampled", "train": False, "modelnet_type": "modelnet10"}
+    # model40net_dataset = ModelNetDataset(cfg)
+    # dataloader = torch.utils.data.DataLoader(model40net_dataset, batch_size=4, shuffle=True)
+    # for i, (point_clouds, class_id) in enumerate(dataloader):
+    #     print (point_clouds.shape, class_id.shape)
+    #     break
+
+    cfg = {"data_path": "../data/shapenetcore_partanno_segmentation_benchmark_v0_normal", 
+           "train": True, 
+           "instance": "02691156",
+           "shape_cut_off": 2500}
+    shapenet_dataset = ShapeNetDataset(cfg)
+    dataloader = torch.utils.data.DataLoader(shapenet_dataset, batch_size=4, shuffle=True)
     for i, (point_clouds, class_id) in enumerate(dataloader):
         print (point_clouds.shape, class_id.shape)
         break
