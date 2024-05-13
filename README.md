@@ -1,25 +1,32 @@
 # PointNet
 
 ## What this is about
-Just a simple implementation based on the PointNet which was in 2017 a revolutionary way of handling point cloud data, which was to... directly look at PointClouds. This is just to get a better understanding of the PointNet and I won't be doing training here. Will be handled when I reach its final(as at 2024 don't flame me) form as in ResPointNet++.
+Just a simple implementation based on the PointNet which was in 2017 a revolutionary way of handling point cloud data, which was to... directly look at PointClouds.
 
 ## What has been done 
 
-1. Set up the Architecture
+1. Set up the Architecture - See /src/model.py
+1. Set up the dataset and dataloader - See /src/data_preprocessing folder
+1. Set up the training - see /src/train.py
+1. Set up validation - Outputs classification reports
+1. Results visualisation - check out ./notebooks/segmentation_inference.ipynb
 
-## What else needs to be done
+## Dataset Used
 
-1. Set up the dataset and dataloader
-1. Set up the training.
-1. Set up validation, but only takes accuracy and loss. 
-1. Results visualisation
+### Classification - ModelNet
+
+The famous ModelNet dataset. The classification network was trained on ModelNet10.
+
+### Part Segmentation - ShapeNet
+
+The segmentation model was trained on the Airplane class in ShapeNet. Do note that the annotation is pretty good, and the parts annotated for one class is not the same as the next class. For example, the Airplane class has parts 0 - 3. The next class would have parts 4 and 5. So there is no overlap.  
 
 ## How to run 
 
-Make sure you change the directory of your data. I used PSNet (not yet implemented yet)
+Make sure you change the directory of your data.
 
 ```
-python -m src.main
+python -m src.train
 ```
 
 ## Useful Sources
