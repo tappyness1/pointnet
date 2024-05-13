@@ -66,6 +66,61 @@ def validation(model, val_set, cfg, get_metrics = False):
 
     return sum(losses)/len(losses)
 
+def validation_segmentation(model, val_set, cfg, get_metrics = False):
+    """Simple validation workflow. Current implementation is for F1 score
+
+    Args:
+        model (_type_): _description_
+        val_set (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    model.eval()
+
+    if cfg['train']['val_subset']:
+        subset_indices = torch.randperm(len(val_set))[:cfg['train']['val_subset']]
+        val_set = Subset(val_set, subset_indices)
+
+    val_dataloader = DataLoader(val_set, batch_size=5, shuffle = True)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    model = model.to(device)
+    preds, gt = [],[]
+    losses = []
+    loss_function = nn.CrossEntropyLoss()
+
+    with tqdm(val_dataloader) as tepoch:
+
+        for imgs, labels in tepoch:
+            
+            with torch.no_grad():
+                out = model(imgs.to(device))
+            loss = loss_function(out.permute(0,2,1), labels.to(torch.long).to(device)) 
+            tepoch.set_postfix(loss=loss.item())  
+            losses.append(loss.item())
+            if get_metrics:
+                preds.append(torch.argmax(out, dim = 2).flatten())
+                gt.append(labels.flatten())
+
+    if get_metrics:
+        # print (torch.cat(preds))
+        preds = torch.cat(preds).cpu()
+        gt = torch.cat(gt).cpu()
+        print (preds.shape)
+        print (gt.shape)
+        cm = process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])
+        cm = pd.DataFrame(cm)
+        print (f"Confusion Matrix: \n{cm}")
+        cm.to_csv("val_results/confusion_matrix.csv", header=False, index=False)
+
+        cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1))
+        print (f"Classification Report: \n{cr}")
+
+    print (f"Validation Loss: {sum(losses)/len(losses)}")
+
+    return sum(losses)/len(losses)
+
 
 if __name__ == "__main__":
     

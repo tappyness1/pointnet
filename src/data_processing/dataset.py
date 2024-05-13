@@ -53,7 +53,23 @@ class ShapeNetDataset(Dataset):
         data_split = [instance.split("/") for instance in data]
 
         # only get the instances of the class. eg airplane only instances
-        self.dataset = ["/".join(instance[1:]) for instance in data_split if instance[1] == cfg['instance']]
+        # self.dataset = ["/".join(instance[1:]) for instance in data_split if instance[1] == cfg['instance']]
+        self.dataset = []
+        for instance in data_split:  
+            if instance[1] == cfg['instance']:
+                instance_path = "/".join(instance[1:])
+                point_cloud_path = os.path.join(self.data_path, f"{instance_path}.txt")
+                point_clouds = pd.read_csv(point_cloud_path, 
+                            delimiter=" ", 
+                            names = ["x", "y", "z", "r", "g", "b", "label"], 
+                            header=None)
+                if point_clouds.shape[0] == 0:
+                  continue
+
+                self.dataset.append("/".join(instance[1:]))
+
+
+        self.cfg = cfg
 
     def __len__(self):
         return len(self.dataset)
@@ -66,9 +82,16 @@ class ShapeNetDataset(Dataset):
                                    delimiter=" ", 
                                    names = ["x", "y", "z", "r", "g", "b", "label"], 
                                    header=None).to_numpy().astype('float32')
-        if point_clouds.shape[0] < cfg['shape_cut_off']:
-            point_clouds = np.concatenate([point_clouds, np.zeros((cfg['shape_cut_off'] - point_clouds.shape[0], 7))])
-        point_clouds = point_clouds[:cfg['shape_cut_off']]
+        
+        # if the we have less points than the cut, then sample from the existing points to make up for it
+        if point_clouds.shape[0] < self.cfg['shape_cut_off']:
+            # print (point_clouds.shape)
+            # print (self.dataset[idx])
+            delta_points = self.cfg['shape_cut_off'] - point_clouds.shape[0]
+            dummy_points_index = np.random.randint(0, point_clouds.shape[0], delta_points)
+            point_clouds = np.concatenate([point_clouds, point_clouds[dummy_points_index]], axis=0)
+
+        point_clouds = point_clouds[:self.cfg['shape_cut_off']]
 
         # TODO: control the dummy points by introducing mask
 
@@ -89,7 +112,7 @@ if __name__ == "__main__":
            "instance": "02691156",
            "shape_cut_off": 2500}
     shapenet_dataset = ShapeNetDataset(cfg)
-    dataloader = torch.utils.data.DataLoader(shapenet_dataset, batch_size=4, shuffle=True)
+    dataloader = torch.utils.data.DataLoader(shapenet_dataset, batch_size=10, shuffle=True)
     for i, (point_clouds, class_id) in enumerate(dataloader):
         print (point_clouds.shape, class_id.shape)
         break
