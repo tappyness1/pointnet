@@ -1,8 +1,7 @@
-
-from torch.nn import Conv2d, ReLU, MaxPool2d, ConvTranspose2d, BatchNorm2d, AdaptiveAvgPool2d, Linear, Softmax
+from torch.nn import ReLU, Conv1d, BatchNorm1d, MaxPool1d
 import torch.nn as nn
 import torch
-import numpy as np
+import numpy as np  
 
 class TransformationNetwork(nn.Module):
     def __init__(self, input_dim:int, output_dim:int) -> None:

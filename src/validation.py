@@ -57,10 +57,11 @@ def validation(model, val_set, cfg, get_metrics = False):
         cm = process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])
         cm = pd.DataFrame(cm)
         print (f"Confusion Matrix: \n{cm}")
-        cm.to_csv("val_results/confusion_matrix.csv", header=False, index=False)
+        cm.to_csv("val_results/classifier_confusion_matrix.csv", header=False, index=False)
 
         cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1))
         print (f"Classification Report: \n{cr}")
+        cr.to_csv("val_results/classifier_classification_report.csv", header=False, index=False)
 
     print (f"Validation Loss: {sum(losses)/len(losses)}")
 
@@ -112,10 +113,11 @@ def validation_segmentation(model, val_set, cfg, get_metrics = False):
         cm = process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])
         cm = pd.DataFrame(cm)
         print (f"Confusion Matrix: \n{cm}")
-        cm.to_csv("val_results/confusion_matrix.csv", header=False, index=False)
+        cm.to_csv("val_results/segmentation_confusion_matrix.csv", header=False, index=False)
 
         cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1))
         print (f"Classification Report: \n{cr}")
+        cr.to_csv("val_results/segmentation_classification_report.csv", header=False, index=False)
 
     print (f"Validation Loss: {sum(losses)/len(losses)}")
 
