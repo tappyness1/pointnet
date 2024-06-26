@@ -5,7 +5,6 @@ from tqdm import tqdm
 import numpy as np
 from src.model import PointNet
 from src.data_processing.dataset import ModelNetDataset, ShapeNetDataset
-from src.metrics import process_confusion_matrix
 from src.validation import validation, validation_segmentation
 
 import torch.nn as nn

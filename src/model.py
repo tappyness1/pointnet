@@ -5,6 +5,7 @@ import numpy as np
 
 class TransformationNetwork(nn.Module):
     def __init__(self, input_dim:int, output_dim:int) -> None:
+
         super(TransformationNetwork, self).__init__()
         self.output_dim = output_dim
         self.shared_mlp_1 = nn.Conv1d(input_dim, 64, 1)
@@ -28,6 +29,7 @@ class TransformationNetwork(nn.Module):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
     def forward(self, input)-> torch.Tensor:
+
         num_points = input.shape[1]
         input = input.transpose(2, 1)
 

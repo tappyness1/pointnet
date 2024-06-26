@@ -166,6 +166,7 @@ class PointNet(nn.Module):
         if network_type == "Segmentation":
             self.segmentation_network = SegmentationNetwork(num_classes=num_classes)
         else: self.classification_network = ClassificationNetWork(num_classes=num_classes)
+        self.network_type = network_type
 
     def forward(self, input):
         num_points = input.shape[1]

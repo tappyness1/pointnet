@@ -54,14 +54,17 @@ def validation(model, val_set, cfg, get_metrics = False):
         # print (torch.cat(preds))
         preds = torch.cat(preds).cpu()
         gt = torch.cat(gt).cpu()
-        cm = process_confusion_matrix(preds, gt, num_classes = cfg['train']['num_classes'])
+        cm = process_confusion_matrix(gt, preds, num_classes = cfg['train']['num_classes'])
         cm = pd.DataFrame(cm)
         print (f"Confusion Matrix: \n{cm}")
         cm.to_csv("val_results/classifier_confusion_matrix.csv", header=False, index=False)
 
-        cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1))
-        print (f"Classification Report: \n{cr}")
+        cr = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1), output_dict = True)
+        cr_print = classification_report(gt, preds, labels = np.arange(0,cfg['train']['num_classes'],1), output_dict = False)
+        print (f"Classification Report: \n{cr_print}")
+        cr = pd.DataFrame(cr).transpose()
         cr.to_csv("val_results/classifier_classification_report.csv", header=False, index=False)
+
 
     print (f"Validation Loss: {sum(losses)/len(losses)}")
 
